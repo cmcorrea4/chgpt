@@ -3,44 +3,75 @@ from openai import OpenAI
 
 st.set_page_config(page_title="Chat OpenAI", page_icon="💬", layout="centered")
 
+# ── Sidebar ──────────────────────────────────────────────
+with st.sidebar:
+    st.header("⚙️ Configuración")
+
+    api_key = st.text_input("🔑 OpenAI API Key", type="password", placeholder="sk-...")
+
+    model = st.selectbox("Modelo", ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"])
+
+    st.divider()
+
+    st.subheader("🤖 Personalidad")
+
+    if "system_prompt" not in st.session_state:
+        st.session_state.system_prompt = ""
+
+    system_input = st.text_area(
+        "System Prompt",
+        value=st.session_state.system_prompt,
+        placeholder="Ej: Eres un asistente experto en Python, responde siempre con ejemplos de código.",
+        height=180,
+        label_visibility="collapsed"
+    )
+
+    if st.button("💾 Guardar personalidad", use_container_width=True):
+        st.session_state.system_prompt = system_input
+        st.success("¡Guardado!")
+
+    if st.session_state.system_prompt:
+        st.caption(f"✅ Activo: *{st.session_state.system_prompt[:60]}...*" 
+                   if len(st.session_state.system_prompt) > 60 
+                   else f"✅ Activo: *{st.session_state.system_prompt}*")
+
+# ── Main ─────────────────────────────────────────────────
 st.title("💬 Chat con OpenAI")
 
-# API Key input
-api_key = st.text_input("🔑 OpenAI API Key", type="password", placeholder="sk-...")
-
-# Model selector
-model = st.selectbox("Modelo", ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"])
-
-st.divider()
-
-# Initialize chat history
+# Inicializar historial
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display chat history
+# Mostrar historial
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
 
-# Chat input
+# Input del usuario
 if prompt := st.chat_input("Escribe un mensaje..."):
     if not api_key:
-        st.warning("Por favor ingresa tu API Key de OpenAI.")
+        st.warning("Por favor ingresa tu API Key en el panel lateral.")
         st.stop()
 
-    # Add user message
+    # Mostrar mensaje del usuario
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.write(prompt)
 
-    # Call OpenAI
+    # Construir lista de mensajes con system prompt
+    messages_to_send = []
+    if st.session_state.system_prompt:
+        messages_to_send.append({"role": "system", "content": st.session_state.system_prompt})
+    messages_to_send += st.session_state.messages
+
+    # Llamar a OpenAI
     client = OpenAI(api_key=api_key)
     with st.chat_message("assistant"):
         with st.spinner("Pensando..."):
             try:
                 response = client.chat.completions.create(
                     model=model,
-                    messages=st.session_state.messages,
+                    messages=messages_to_send,
                 )
                 reply = response.choices[0].message.content
                 st.write(reply)
@@ -48,7 +79,7 @@ if prompt := st.chat_input("Escribe un mensaje..."):
             except Exception as e:
                 st.error(f"Error: {e}")
 
-# Clear button
+# Botón limpiar
 if st.session_state.messages:
     if st.button("🗑️ Limpiar conversación"):
         st.session_state.messages = []
