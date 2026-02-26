@@ -1,9 +1,9 @@
 import streamlit as st
 from openai import OpenAI
 
-st.set_page_config(page_title="Mi propio chat", page_icon="💬", layout="centered")
+st.set_page_config(page_title="Chat OpenAI", page_icon="💬", layout="centered")
 
-st.title("💬 Mi propio chat")
+st.title("💬 Chat con OpenAI")
 
 # API Key input
 api_key = st.text_input("🔑 OpenAI API Key", type="password", placeholder="sk-...")
