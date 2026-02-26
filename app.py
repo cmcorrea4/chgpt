@@ -21,7 +21,7 @@ with st.sidebar:
     system_input = st.text_area(
         "System Prompt",
         value=st.session_state.system_prompt,
-        placeholder="Ej: Eres un asistente experto en Python, responde siempre con ejemplos de código.",
+        placeholder="Ej: Eres un asistente muy gracioso, responde siempre con algo gracioso.",
         height=180,
         label_visibility="collapsed"
     )
