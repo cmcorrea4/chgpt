@@ -1,7 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 
-st.set_page_config(page_title="Chat OpenAI", page_icon="💬", layout="centered")
+st.set_page_config(page_title="Mi propio chat", page_icon="💬", layout="centered")
 
 # ── Sidebar ──────────────────────────────────────────────
 with st.sidebar:
@@ -36,7 +36,7 @@ with st.sidebar:
                    else f"✅ Activo: *{st.session_state.system_prompt}*")
 
 # ── Main ─────────────────────────────────────────────────
-st.title("💬 Chat con OpenAI")
+st.title("💬 Mi propio Chat")
 
 # Inicializar historial
 if "messages" not in st.session_state:
